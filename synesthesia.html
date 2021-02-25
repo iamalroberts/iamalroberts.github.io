@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<style>
+textarea{
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+span {
+   width: 100%;
+  margin: 8px 0;
+  border-radius: 4px;
+}
+input[type=button] {
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+
+
+</style>
+<body>
+<H1>The Synesthesia Project</H1>
+<form id="TheForm">
+    <textarea id="inputText" type="text" rows="4" cols="50"></textarea>
+    <br/>
+    <input id="submit" value="Submit" type="button" />
+
+</form>
+<span id="paragraph">Your colored text will appear here.</span>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script type="text/javascript">
+var dict = {};
+   var spData = null;
+  function doData(json) {
+      spData = json.feed.entry;
+  }
+
+  function readData(parent) {
+      var data = spData;
+      for(var r=0; r<data.length; r+=2) {
+        if(data[r+1]["gs$cell"]["$t"] == "white" || data[r+1]["gs$cell"]["$t"] == "yellow" ){
+          var newVal = data[r+1]["gs$cell"]["$t"].concat(";background-color:black");
+         dict [ data[r]["gs$cell"]["$t"]] = newVal;
+       }else
+       {
+        dict [ data[r]["gs$cell"]["$t"]] = data[r+1]["gs$cell"]["$t"];
+       }
+
+      }
+
+  }
+  $(document).ready(function(){
+      readData($("#data"));
+  });
+</script>
+<script>
+
+//var paragrapgh = document.getElementById("paragraph");
+//var words = paragrapgh.innerText.split(" "); // here I am spliting words by space i.e tokenizing it
+
+
+function changeColors()
+{
+
+//var input = "Monday Tuesday";
+var inputText = document.getElementById("inputText").value;
+var spans = [];
+
+
+var display = document.getElementById("paragraph");
+var words = inputText.split(" ");
+for(var x = 0; x < words.length; x++){
+  var span = "<span style='color: " + dict[words[x]] + ";'>" +    words[x] + "</span>";
+
+    spans.push(span);
+}
+
+// setting colored spans as paragraph HTML
+display.innerHTML = spans.join(" ");
+}
+
+document.getElementById("submit").addEventListener("click", changeColors, false);
+</script>
+<script src="https://spreadsheets.google.com/feeds/cells/1hh8DyOGb8TVUJMDC2f08GupXQy1y5NUyKlGcVNoOJvs/1/public/values?alt=json-in-script&callback=doData"></script>
+</body>
+</html>
